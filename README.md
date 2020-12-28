@@ -44,9 +44,16 @@ _Requires a request body._
 | :------- | -----------------: |
 | email    | string, _required_ |
 | password | string, _required_ |
+| username | string, _required_ |
 
 #### Example response:
 
 ```
 HTTP STATUS 200 OK
+location: /api/user/1
+{
+  "id": 1,
+  "username": "demo",
+  "email": "demo@example.com",
+}
 ```
