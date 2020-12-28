@@ -3,7 +3,7 @@ BEGIN;
 TRUNCATE
   "user";
 
-INSERT INTO "user" ("id", "username", "name", "password")
+INSERT INTO "user" ("id", "email", "username", "password")
 VALUES
   (
     1,
