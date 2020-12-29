@@ -81,7 +81,13 @@ recordRouter
 
 recordRouter
   .get('/', async (req, res, next) => {
-
+    const db = req.app.get('db');
+    try {
+      const userRecords = await RecordService.getUserRecords(db, req.user.id)
+      return res.status(200).send(userRecords);
+    } catch (error) {
+      next(error);
+    }
   });
 
 module.exports = recordRouter;

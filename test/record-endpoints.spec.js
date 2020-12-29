@@ -4,7 +4,7 @@ const { set, post } = require('../src/app');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Record Endpoints', function () {
+describe.only('Record Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -154,8 +154,33 @@ describe('Record Endpoints', function () {
   /**
    * @description Get an array of a user's Records
    **/
-  describe('GET /api/record', () => {
-    // should return all user records
+  describe.only('GET /api/record', () => {
+    it('responds with 401 unauthorized when no auth header set', () => {
+      return supertest(app)
+        .get('/api/record')
+        .expect(401, {
+          error: 'Missing bearer token'
+        })
+    });
 
+    it('returns all user records', () => {
+      return supertest(app)
+        .get('/api/record')
+        .set(auth)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).to.be.an('array');
+          res.body.forEach(record => {
+            expect(record).to.include.all.keys(
+              'id',
+              'name',
+              'body',
+              'id_user',
+              'created',
+              'id_form',
+            );
+          })
+        })
+    })
   });
 })
