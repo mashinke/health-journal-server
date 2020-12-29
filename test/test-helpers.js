@@ -34,6 +34,64 @@ function makeUsersArray() {
   ];
 }
 
+function makeFormsArray() {
+  return [
+    {
+      id: 1,
+      name: 'test-form-1',
+      body: JSON.stringify(
+        [
+          {
+            label: 'labelOne',
+            type: 'string'
+          },
+          {
+            label: 'labelTwo',
+            type: 'number'
+          },
+          {
+            label: 'labelFour',
+            type: 'range',
+            min: 0,
+            max: 5
+          },
+          {
+            label: 'labelThree',
+            type: 'boolean'
+          },
+        ]
+      ),
+      description: 'test description',
+      id_user: 1
+    },
+  ]
+}
+
+function makeRecordsArray() {
+  return [
+    {
+      id: 1,
+      body: JSON.stringify({
+        labelOne: 'valueOne',
+        labelTwo: 5,
+        labelThree: true,
+        labelFour: 3
+      }),
+      id_form: 1,
+    },
+    {
+      id: 2,
+      body: JSON.stringify({
+        labelOne: 'valueOne',
+        labelTwo: 5,
+        labelThree: true,
+        labelFour: 5
+      }),
+      id_form: 1
+    },
+  ]
+}
+
 /**
  * make a bearer token with jwt for authorization header
  * @param {object} user - contains `id`, `username`
@@ -101,11 +159,33 @@ function seedUsers(db, users) {
   });
 }
 
+async function seedUsersFormsRecords(db, users, forms, records) {
+  await seedUsers(db, users);
+
+  await db.transaction(async trx => {
+    await trx.into('form').insert(forms);
+    await trx.into('record').insert(records)
+
+    await Promise.all([
+      trx.raw(
+        'SELECT setval(\'form_id_seq\', ?)',
+        [forms[forms.length - 1].id],
+      ),
+      trx.raw(
+        'SELECT setval(\'record_id_seq\', ?)',
+        [records[records.length - 1].id],
+      )
+    ]);
+  });
+}
 
 module.exports = {
   makeKnexInstance,
   makeUsersArray,
+  makeRecordsArray,
+  makeFormsArray,
   makeAuthHeader,
   cleanTables,
   seedUsers,
+  seedUsersFormsRecords
 };
