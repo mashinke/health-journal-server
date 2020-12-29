@@ -57,12 +57,24 @@ function cleanTables(db) {
   return db.transaction(trx =>
     trx.raw(
       `TRUNCATE
+        "record_tag",
+        "tag",
+        "record",
+        "form",
         "user"`
     )
       .then(() =>
         Promise.all([
           trx.raw('ALTER SEQUENCE user_id_seq minvalue 0 START WITH 1'),
+          trx.raw('ALTER SEQUENCE form_id_seq minvalue 0 START WITH 1'),
+          trx.raw('ALTER SEQUENCE record_id_seq minvalue 0 START WITH 1'),
+          trx.raw('ALTER SEQUENCE tag_id_seq minvalue 0 START WITH 1'),
+          trx.raw('ALTER SEQUENCE record_tag_id_seq minvalue 0 START WITH 1'),
           trx.raw('SELECT setval(\'user_id_seq\', 0)'),
+          trx.raw('SELECT setval(\'form_id_seq\', 0)'),
+          trx.raw('SELECT setval(\'record_id_seq\', 0)'),
+          trx.raw('SELECT setval(\'tag_id_seq\', 0)'),
+          trx.raw('SELECT setval(\'record_tag_id_seq\', 0)'),
         ])
       )
   );
