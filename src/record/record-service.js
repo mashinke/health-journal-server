@@ -39,7 +39,7 @@ const RecordService = {
     })
     return {
       id,
-      name: xss(name),
+      name,
       description: xss(description),
       values,
       fields,
