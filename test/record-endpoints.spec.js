@@ -143,9 +143,9 @@ describe.only('Record Endpoints', function () {
               .select('body')
               .where({ id: res.body.id })
               .first()
-              .then((row) => {
-                expect(row.body).to.eql(postAttemptBody.body);
-              });
+              .then((row) =>
+                expect(row.body).to.eql(postAttemptBody.body)
+              );
           });
       });
     });
@@ -154,7 +154,7 @@ describe.only('Record Endpoints', function () {
   /**
    * @description Get an array of a user's Records
    **/
-  describe.only('GET /api/record', () => {
+  describe('GET /api/record', () => {
     it('responds with 401 unauthorized when no auth header set', () => {
       return supertest(app)
         .get('/api/record')
@@ -170,17 +170,16 @@ describe.only('Record Endpoints', function () {
         .expect(200)
         .expect(res => {
           expect(res.body).to.be.an('array');
-          res.body.forEach(record => {
+          res.body.forEach(record =>
             expect(record).to.include.all.keys(
               'id',
               'name',
               'body',
-              'id_user',
               'created',
-              'id_form',
-            );
-          })
-        })
-    })
+              'formId',
+            )
+          );
+        });
+    });
   });
-})
+});

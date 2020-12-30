@@ -44,7 +44,7 @@ recordRouter
       for (const field of formFields) {
         const { label, type } = field;
         if (
-          !(body[label] === undefined)
+          !(body[label] === undefined) // no required fields atm
           && !(
             type === 'range'
             && body[label] <= field.max
@@ -56,23 +56,14 @@ recordRouter
             error: 'Malformed request, record body does not match form specifications'
           });
       }
-      const {
-        id,
-        created
-      } = await RecordService.postNewRecord(db, formId, body);
-      // don't forget xss
+      const newRecord = await RecordService.postNewRecord(db, formId, body);
 
-      const payload = {
-        id,
-        created,
-        name,
-        description,
-        body
-      }
-
+      // postNewRecord() doesn't join with form, so we add the properties here
+      Object.assign(newRecord, { name, description });
+      const payload = RecordService.prepareRecord(newRecord);
       return res
         .status(201)
-        .location(path.posix.join(req.originalUrl, `/${id}`))
+        .location(path.posix.join(req.originalUrl, `/${newRecord.id}`))
         .json(payload);
     } catch (error) {
       next(error);
@@ -84,7 +75,9 @@ recordRouter
     const db = req.app.get('db');
     try {
       const userRecords = await RecordService.getUserRecords(db, req.user.id)
-      return res.status(200).send(userRecords);
+      const payload = userRecords.map(RecordService.prepareRecord);
+
+      return res.status(200).send(payload);
     } catch (error) {
       next(error);
     }

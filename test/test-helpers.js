@@ -69,10 +69,10 @@ function makeFormsArray() {
 
 function makeRecordsArray() {
   return [
-    {
+    { // this one will test xss precautions
       id: 1,
       body: JSON.stringify({
-        labelOne: 'valueOne',
+        labelOne: '<SCRIPT>evil</SCRIPT>',
         labelTwo: 5,
         labelThree: true,
         labelFour: 3
