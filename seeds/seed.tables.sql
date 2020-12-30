@@ -30,7 +30,7 @@ VALUES
       {
         "label": "Range Field",
         "type": "range",
-        "min": 0,
+        "min": 1,
         "max": 5
       },
       {
