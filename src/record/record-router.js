@@ -12,9 +12,9 @@ recordRouter
 
 recordRouter
   .post('/', jsonBodyParser, async (req, res, next) => {
-    const { formId, body } = req.body;
+    const { formId, values } = req.body;
     try {
-      for (const key of ['formId', 'body']) {
+      for (const key of ['formId', 'values']) {
         const value = req.body[key];
         if (value == null) {
           return res.status(400).json({
@@ -37,29 +37,28 @@ recordRouter
       const {
         name,
         description,
-        body: formFields
+        fields,
       } = userForm
 
       // validate body format
-      for (const field of formFields) {
+      for (const field of fields) {
         const { label, type } = field;
         if (
-          !(body[label] === undefined) // no required fields atm
+          !(values[label] === undefined) // no required fields atm
           && !(
             type === 'range'
-            && body[label] <= field.max
-            && body[label] >= field.min
+            && values[label] <= field.max
+            && values[label] >= field.min
           )
-          && !(typeof body[label] === type)
+          && !(typeof values[label] === type)
         )
           return res.status(400).json({
             error: 'Malformed request, record body does not match form specifications'
           });
       }
-      const newRecord = await RecordService.postNewRecord(db, formId, body);
-
+      const newRecord = await RecordService.postNewRecord(db, formId, values);
       // postNewRecord() doesn't join with form, so we add the properties here
-      Object.assign(newRecord, { name, description });
+      Object.assign(newRecord, { name, description, fields });
       const payload = RecordService.prepareRecord(newRecord);
       return res
         .status(201)

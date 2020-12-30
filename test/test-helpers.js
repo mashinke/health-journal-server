@@ -39,7 +39,7 @@ function makeFormsArray() {
     {
       id: 1,
       name: 'test-form-1',
-      body: JSON.stringify(
+      fields: JSON.stringify(
         [
           {
             label: 'labelOne',
@@ -71,7 +71,7 @@ function makeRecordsArray() {
   return [
     { // this one will test xss precautions
       id: 1,
-      body: JSON.stringify({
+      values: JSON.stringify({
         labelOne: '<SCRIPT>evil</SCRIPT>',
         labelTwo: 5,
         labelThree: true,
@@ -81,7 +81,7 @@ function makeRecordsArray() {
     },
     {
       id: 2,
-      body: JSON.stringify({
+      values: JSON.stringify({
         labelOne: 'valueOne',
         labelTwo: 5,
         labelThree: true,

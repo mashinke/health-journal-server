@@ -4,7 +4,7 @@ const { set, post } = require('../src/app');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Record Endpoints', function () {
+describe('Record Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -39,7 +39,7 @@ describe.only('Record Endpoints', function () {
    * @description Post a new Record to the database
    **/
   describe('POST /api/record', () => {
-    const requiredFields = ['formId', 'body'];
+    const requiredFields = ['formId', 'values'];
 
     it('responds with 401 unauthorized when no auth header set', () => {
       return supertest(app)
@@ -73,7 +73,7 @@ describe.only('Record Endpoints', function () {
     it(`responds with 400 incorrect when no 'formId' connected to user`, () => {
       const postAttemptBody = {
         formId: 99,
-        body: {
+        values: {
           value: 'something'
         }
       };
@@ -87,10 +87,10 @@ describe.only('Record Endpoints', function () {
         });
     });
 
-    it(`responds with 400 malformed when 'body' doesn't match form`, () => {
+    it(`responds with 400 malformed when 'values' doesn't match form`, () => {
       const postAttemptBody = {
         formId: 1,
-        body: {
+        values: {
           labelOne: 'invalid',
           labelTwo: 4,
           labelThree: false,
@@ -110,7 +110,7 @@ describe.only('Record Endpoints', function () {
     describe('Given a valid record', () => {
       const postAttemptBody = {
         formId: testForm.id,
-        body: {
+        values: {
           labelOne: 'test-value',
           labelTwo: 5,
           labelThree: true,
@@ -118,7 +118,28 @@ describe.only('Record Endpoints', function () {
         }
       };
 
-      it('responds 201, serialized record', () => {
+      it.only('responds 201, serialized record', () => {
+        const fields = [
+          {
+            label: 'labelOne',
+            type: 'string'
+          },
+          {
+            label: 'labelTwo',
+            type: 'number'
+          },
+          {
+            label: 'labelFour',
+            type: 'range',
+            min: 0,
+            max: 5
+          },
+          {
+            label: 'labelThree',
+            type: 'boolean'
+          },
+        ]
+
         return supertest(app)
           .post('/api/record')
           .set(auth)
@@ -127,7 +148,8 @@ describe.only('Record Endpoints', function () {
           .expect(res => {
             expect(res.body).to.have.property('id');
             expect(res.body.name).to.eql(testForm.name);
-            expect(res.body.body).to.eql(postAttemptBody.body);
+            expect(res.body.values).to.eql(postAttemptBody.values);
+            expect(res.body.fields).to.eql(fields);
             expect(res.headers.location).to.eql(`/api/record/${res.body.id}`);
           })
       });
@@ -140,11 +162,11 @@ describe.only('Record Endpoints', function () {
           .then(res => {
             return db
               .from('record')
-              .select('body')
+              .select('values')
               .where({ id: res.body.id })
               .first()
               .then((row) =>
-                expect(row.body).to.eql(postAttemptBody.body)
+                expect(row.values).to.eql(postAttemptBody.values)
               );
           });
       });
@@ -174,7 +196,8 @@ describe.only('Record Endpoints', function () {
             expect(record).to.include.all.keys(
               'id',
               'name',
-              'body',
+              'values',
+              'fields',
               'created',
               'formId',
             )

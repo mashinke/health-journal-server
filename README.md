@@ -73,16 +73,38 @@ _Requires a request body._
 HTTP STATUS 200 OK
 location: /api/user/1
 {
-    "id": 1,
+    "id": 3,
     "name": "Example Form",
     "description": "An example form",
-    "body": {
-        "Range Field": 3,
-        "Number Field": 6,
-        "String Field": "An example string entry",
-        "Yes or No Field": true
+    "values": {
+        "values": {
+            "Range Field": 4,
+            "Number Field": 18,
+            "String Field": "I posted a record!",
+            "Yes or No Field": true
+        }
     },
-    "created": "2020-12-30T17:38:59.621Z",
+    "fields": [
+        {
+            "type": "string",
+            "label": "String Field"
+        },
+        {
+            "type": "number",
+            "label": "Number Field"
+        },
+        {
+            "type": "range",
+            "label": "Range Field",
+            "min": 0,
+            "max": 5
+        },
+        {
+            "type": "boolean",
+            "label": "Yes or No Field"
+        }
+    ],
+    "created": "2020-12-30T19:45:48.531Z",
     "formId": 1
 }
 ```
@@ -99,26 +121,66 @@ location: /api/user/1
         "id": 1,
         "name": "Example Form",
         "description": "An example form",
-        "body": {
+        "values": {
             "Range Field": 3,
             "Number Field": 6,
             "String Field": "An example string entry",
             "Yes or No Field": true
         },
-        "created": "2020-12-30T17:45:55.952Z",
+        "fields": [
+            {
+                "type": "string",
+                "label": "String Field"
+            },
+            {
+                "type": "number",
+                "label": "Number Field"
+            },
+            {
+                "type": "range",
+                "label": "Range Field",
+                "min": 0,
+                "max": 5
+            },
+            {
+                "type": "boolean",
+                "label": "Yes or No Field"
+            }
+        ],
+        "created": "2020-12-30T19:08:27.012Z",
         "formId": 1
     },
     {
         "id": 2,
         "name": "Example Form",
         "description": "An example form",
-        "body": {
+        "values": {
             "Range Field": 5,
             "Number Field": 11,
             "String Field": "Another example string entry",
             "Yes or No Field": false
         },
-        "created": "2020-12-30T17:45:55.952Z",
+        "fields": [
+            {
+                "type": "string",
+                "label": "String Field"
+            },
+            {
+                "type": "number",
+                "label": "Number Field"
+            },
+            {
+                "type": "range",
+                "label": "Range Field",
+                "min": 0,
+                "max": 5
+            },
+            {
+                "type": "boolean",
+                "label": "Yes or No Field"
+            }
+        ],
+        "created": "2020-12-30T19:08:27.012Z",
         "formId": 1
     }
 ]

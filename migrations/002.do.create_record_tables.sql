@@ -4,14 +4,14 @@ CREATE TABLE "form" (
   "id" SERIAL PRIMARY KEY,
   "name" TEXT NOT NULL,
   "description" TEXT,
-  "body" JSONB NOT NULL,
+  "fields" JSONB NOT NULL,
   "id_user" INTEGER REFERENCES "user"(id) NOT NULL
 );
 
 CREATE TABLE "record" (
   "id" SERIAL PRIMARY KEY,
   "created" TIMESTAMP DEFAULT NOW(),
-  "body" JSONB NOT NULL,
+  "values" JSONB NOT NULL,
   "id_form" INTEGER REFERENCES "form"(id) NOT NULL
 );
 

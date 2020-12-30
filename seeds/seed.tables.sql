@@ -13,7 +13,7 @@ VALUES
     '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG'
   );
 
-INSERT INTO "form" ("id", "name", "body", "description", "id_user")
+INSERT INTO "form" ("id", "name", "fields", "description", "id_user")
 VALUES 
   (
     1,
@@ -42,7 +42,7 @@ VALUES
     1
   );
 
-INSERT INTO "record" ("id", "body", "id_form")
+INSERT INTO "record" ("id", "values", "id_form")
 VALUES 
   (
     1,
