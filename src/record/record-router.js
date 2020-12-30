@@ -41,8 +41,11 @@ recordRouter
       } = userForm
 
       // validate body format
+      const labels = [];
+
       for (const field of fields) {
         const { label, type } = field;
+        labels.push(label);
         if (
           !(values[label] === undefined) // no required fields atm
           && !(
@@ -55,6 +58,12 @@ recordRouter
           return res.status(400).json({
             error: 'Malformed request, record body does not match form specifications'
           });
+      }
+      for (label of Object.keys(values)) {
+        if (!labels.includes(label))
+          return res.status(400).json({
+            error: 'Malformed request, record body does not match form specifications'
+          })
       }
       const newRecord = await RecordService.postNewRecord(db, formId, values);
       // postNewRecord() doesn't join with form, so we add the properties here

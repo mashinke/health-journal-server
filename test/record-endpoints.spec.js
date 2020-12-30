@@ -87,7 +87,27 @@ describe('Record Endpoints', function () {
         });
     });
 
-    it(`responds with 400 malformed when 'values' doesn't match form`, () => {
+    it(`responds with 400 malformed when incorrect label`, () => {
+      const postAttemptBody = {
+        formId: 1,
+        values: {
+          labelOne: 'invalid',
+          bloop: 4,
+          labelThree: false,
+          labelFour: 5
+        }
+      };
+
+      return supertest(app)
+        .post('/api/record')
+        .set(auth)
+        .send(postAttemptBody)
+        .expect(400, {
+          error: `Malformed request, record body does not match form specifications`
+        });
+    });
+
+    it(`responds with 400 malformed when incorrect value`, () => {
       const postAttemptBody = {
         formId: 1,
         values: {
