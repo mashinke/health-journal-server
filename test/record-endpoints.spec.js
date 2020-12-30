@@ -138,7 +138,7 @@ describe('Record Endpoints', function () {
         }
       };
 
-      it.only('responds 201, serialized record', () => {
+      it('responds 201, serialized record', () => {
         const fields = [
           {
             label: 'labelOne',
