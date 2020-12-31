@@ -85,7 +85,7 @@ recordRouter
       const userRecords = await RecordService.getUserRecords(db, req.user.id)
       const payload = userRecords.map(RecordService.prepareRecord);
 
-      return res.status(200).send(payload);
+      return res.status(200).send(payload.reverse());
     } catch (error) {
       next(error);
     }
