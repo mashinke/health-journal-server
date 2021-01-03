@@ -19,7 +19,6 @@ recordRouter
         if (value == null) {
           return res.status(400).json({
             error: `Missing '${key}' in request body`
-
           });
         }
       }
