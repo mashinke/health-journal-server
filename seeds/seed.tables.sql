@@ -40,6 +40,32 @@ VALUES
     ]',
     'An example form',
     1
+  ),
+  (
+    2,
+    'Example Form 2',
+    '[
+      {
+        "label": "Number Field",
+        "type": "number"
+      },
+      {
+        "label": "Number Field 2",
+        "type": "number"
+      },
+      {
+        "label": "Range Field",
+        "type": "range",
+        "min": 1,
+        "max": 10
+      },
+      {
+        "label": "Yes or No Field",
+        "type": "boolean"
+      }
+    ]',
+    'Another example form',
+    1
   );
 
 INSERT INTO "record" ("id", "values", "id_form")
