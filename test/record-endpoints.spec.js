@@ -38,7 +38,7 @@ describe('Record Endpoints', function () {
   /**
    * @description Post a new Record to the database
    **/
-  describe.only('POST /api/record', () => {
+  describe('POST /api/record', () => {
     const requiredFields = ['formId', 'values'];
 
     it('responds with 401 unauthorized when no auth header set', () => {

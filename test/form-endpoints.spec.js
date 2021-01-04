@@ -60,9 +60,159 @@ describe('Form Endpoints', function () {
               'name',
               'fields'
             )
-            // console.log(form)
           );
         });
+    });
+  });
+
+
+  /**
+   * @description Post a new Form
+   **/
+  describe.only('POST /api/form', () => {
+    const requiredFields = ['name', 'fields'];
+
+    it('responds with 401 unauthorized when no auth header set', () => {
+      return supertest(app)
+        .post('/api/form')
+        .expect(401, {
+          error: 'Missing bearer token'
+        })
+    });
+
+    requiredFields.forEach(field => {
+      const postAttemptBody = {
+        name: 'test form',
+        fields: [
+          {
+            id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
+            label: 'labelOne',
+            type: 'string'
+          }
+        ]
+      };
+
+      it(`responds with 400 required error when '${field}' is missing`, () => {
+        delete postAttemptBody[field];
+
+        return supertest(app)
+          .post('/api/form')
+          .set(auth)
+          .send(postAttemptBody)
+          .expect(400, {
+            error: `Missing '${field}' in request body`
+          });
+      });
+    });
+
+    it('responds with 400 malformed when wrong keys in fields', () => {
+      const postAttemptBody = {
+        fields: [
+          {
+            foo: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
+            label: 'labelOne',
+            type: 'string'
+          }
+        ],
+        name: 'new-test-form',
+        description: 'another form to test'
+      };
+      return supertest(app)
+        .post('/api/form')
+        .set(auth)
+        .send(postAttemptBody)
+        .expect(400, {
+          error: `'foo' is not a valid field key`
+        });
+    });
+
+    it('responds with 400 malformed when field keys missing', () => {
+      const postAttemptBody = {
+        fields: [
+          {
+            label: 'labelOne',
+            type: 'string'
+          }
+        ],
+        name: 'new-test-form',
+        description: 'another form to test'
+      };
+      return supertest(app)
+        .post('/api/form')
+        .set(auth)
+        .send(postAttemptBody)
+        .expect(400, {
+          error: `'id' is missing from field`
+        });
+    });
+
+    it('responds with 400 malformed when wrong types in fields', () => {
+      const postAttemptBody = {
+        fields: [
+          {
+            id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
+            label: 'labelOne',
+            type: 'invalid'
+          }
+        ],
+        name: 'new-test-form',
+        description: 'another form to test'
+      };
+      return supertest(app)
+        .post('/api/form')
+        .set(auth)
+        .send(postAttemptBody)
+        .expect(400, {
+          error: `'invalid' is not a valid field type`
+        });
+    });
+
+    describe('given a valid form', () => {
+      const postAttemptBody = {
+        fields: [
+          {
+            id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
+            label: 'labelOne',
+            type: 'string'
+          },
+          {
+            id: '2888aa74-4eef-11eb-b544-9ff93ffc6d13',
+            label: 'labelTwo',
+            type: 'number'
+          }
+        ],
+        name: 'new-test-form',
+        description: 'another form to test'
+      }
+      it('returns 201, valid form', () => {
+        return supertest(app)
+          .post('/api/form')
+          .set(auth)
+          .send(postAttemptBody)
+          .expect(201)
+          .expect(res => {
+            expect(res.body).to.have.property('id');
+            expect(res.body).to.have.property('name');
+            expect(res.body).to.have.property('description');
+            expect(res.body).to.have.property('fields');
+          })
+      });
+      it('stores the new form in db', () => {
+        return supertest(app)
+          .post('/api/form')
+          .set(auth)
+          .send(postAttemptBody)
+          .then(res => {
+            return db
+              .from('form')
+              .select('fields')
+              .where({ id: res.body.id })
+              .first()
+              .then(row =>
+                expect(row.fields).to.eql(postAttemptBody.fields)
+              );
+          });
+      });
     });
   });
 });

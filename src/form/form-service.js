@@ -1,6 +1,19 @@
 const xss = require("xss")
 
 const FormService = {
+  postNewForm(db, id_user, formData) {
+    const { fields, name, description } = formData;
+    return db
+      .into('form')
+      .insert({
+        name,
+        description,
+        id_user,
+        fields: JSON.stringify(fields)
+      })
+      .returning('*')
+      .then(rows => rows[0]);
+  },
   getUserForm(db, id_user, id) {
     return db
       .from('form')
