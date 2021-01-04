@@ -22,9 +22,10 @@ const RecordService = {
     const name = xss(record.name);
     const description = xss(record.description);
     const fields = record.fields.map(field => {
-      const { type, min, max } = field;
+      const { type, min, max, id } = field;
       const label = xss(field.label);
       return {
+        id,
         type,
         label,
         min,

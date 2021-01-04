@@ -38,7 +38,7 @@ describe('Record Endpoints', function () {
   /**
    * @description Post a new Record to the database
    **/
-  describe('POST /api/record', () => {
+  describe.only('POST /api/record', () => {
     const requiredFields = ['formId', 'values'];
 
     it('responds with 401 unauthorized when no auth header set', () => {
@@ -91,10 +91,10 @@ describe('Record Endpoints', function () {
       const postAttemptBody = {
         formId: 1,
         values: {
-          labelOne: 'invalid',
+          '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': 'invalid',
           bloop: 4,
-          labelThree: false,
-          labelFour: 5
+          '2888aab0-4ec2-11eb-b545-8f760ba05e58': false,
+          '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 5
         }
       };
 
@@ -111,10 +111,10 @@ describe('Record Endpoints', function () {
       const postAttemptBody = {
         formId: 1,
         values: {
-          labelOne: 'invalid',
-          labelTwo: 4,
-          labelThree: false,
-          labelFour: 10
+          '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': 'invalid',
+          '2888aa74-4ec2-11eb-b544-9ff93ffc6d13': 4,
+          '2888aab0-4ec2-11eb-b545-8f760ba05e58': false,
+          '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 10
         }
       };
 
@@ -131,30 +131,34 @@ describe('Record Endpoints', function () {
       const postAttemptBody = {
         formId: testForm.id,
         values: {
-          labelOne: 'test-value',
-          labelTwo: 5,
-          labelThree: true,
-          labelFour: 3
+          '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': 'test-value',
+          '2888aa74-4ec2-11eb-b544-9ff93ffc6d13': 5,
+          '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
+          '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 3
         }
       };
 
       it('responds 201, serialized record', () => {
         const fields = [
           {
+            id: '2888a8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
             type: 'string'
           },
           {
+            id: '2888aa74-4ec2-11eb-b544-9ff93ffc6d13',
             label: 'labelTwo',
             type: 'number'
           },
           {
+            id: '2888aad8-4ec2-11eb-b546-9f3c6f78d71a',
             label: 'labelFour',
             type: 'range',
             min: 0,
             max: 5
           },
           {
+            id: '2888aab0-4ec2-11eb-b545-8f760ba05e58',
             label: 'labelThree',
             type: 'boolean'
           },

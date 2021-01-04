@@ -40,26 +40,26 @@ recordRouter
       } = userForm
 
       // validate body format
-      const labels = [];
+      const ids = [];
 
       for (const field of fields) {
-        const { label, type } = field;
-        labels.push(label);
+        const { id, type } = field;
+        ids.push(id);
         if (
-          !(values[label] === undefined) // no required fields atm
+          !(values[id] === undefined) // no required fields atm
           && !(
             type === 'range'
-            && values[label] <= field.max
-            && values[label] >= field.min
+            && values[id] <= field.max
+            && values[id] >= field.min
           )
-          && !(typeof values[label] === type)
+          && !(typeof values[id] === type)
         )
           return res.status(400).json({
             error: 'Malformed request, record body does not match form specifications'
           });
       }
-      for (label of Object.keys(values)) {
-        if (!labels.includes(label))
+      for (id of Object.keys(values)) {
+        if (!ids.includes(id))
           return res.status(400).json({
             error: 'Malformed request, record body does not match form specifications'
           })

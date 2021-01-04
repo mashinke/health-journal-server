@@ -42,20 +42,24 @@ function makeFormsArray() {
       fields: JSON.stringify(
         [
           {
+            id: '2888a8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
             type: 'string'
           },
           {
+            id: '2888aa74-4ec2-11eb-b544-9ff93ffc6d13',
             label: 'labelTwo',
             type: 'number'
           },
           {
+            id: '2888aad8-4ec2-11eb-b546-9f3c6f78d71a',
             label: 'labelFour',
             type: 'range',
             min: 0,
             max: 5
           },
           {
+            id: '2888aab0-4ec2-11eb-b545-8f760ba05e58',
             label: 'labelThree',
             type: 'boolean'
           },
@@ -72,20 +76,20 @@ function makeRecordsArray() {
     { // this one will test xss precautions
       id: 1,
       values: JSON.stringify({
-        labelOne: '<SCRIPT>evil</SCRIPT>',
-        labelTwo: 5,
-        labelThree: true,
-        labelFour: 3
+        '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': '<SCRIPT>evil</SCRIPT>',
+        '2888aa74-4ec2-11eb-b544-9ff93ffc6d13': 5,
+        '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
+        '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 3
       }),
       id_form: 1,
     },
     {
       id: 2,
       values: JSON.stringify({
-        labelOne: 'valueOne',
-        labelTwo: 5,
-        labelThree: true,
-        labelFour: 5
+        '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': 'valueOne',
+        '2888aa74-4ec2-11eb-b544-9ff93ffc6d13': 5,
+        '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
+        '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 5
       }),
       id_form: 1
     },
