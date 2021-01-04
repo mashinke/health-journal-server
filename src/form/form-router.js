@@ -1,6 +1,8 @@
 const express = require('express');
+const path = require('path');
 const FormService = require('./form-service');
 const { requireAuth } = require('../middleware/jwt-auth');
+const validateFormFields = require('../middleware/validate-form-fields');
 
 const formRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -22,58 +24,68 @@ formRouter
   });
 
 formRouter
-  .post('/', jsonBodyParser, async (req, res, next) => {
-    const db = req.app.get('db');
-    try {
-      const { name, description, fields } = req.body;
+  .post('/',
+    jsonBodyParser,
+    validateFormFields,
+    async (req, res, next) => {
+      const db = req.app.get('db');
+      try {
+        const { name, description, fields } = req.body;
 
-      for (const key of ['name', 'fields']) {
-        const value = req.body[key];
-        if (value == null) {
-          return res.status(400).json({
-            error: `Missing '${key}' in request body`
-          });
+        for (const key of ['name', 'fields']) {
+          const value = req.body[key];
+          if (value == null) {
+            return res.status(400).json({
+              error: `Missing '${key}' in request body`
+            });
+          }
         }
-      }
 
-      for (const field of fields) {
-        if (!['string', 'number', 'boolean', 'range'].includes(field.type)) {
-
-          return res.status(400).json({
-            error: `'${field.type}' is not a valid field type`
+        const newForm = await FormService.postNewForm(
+          db,
+          req.user.id,
+          {
+            name,
+            description,
+            fields
           })
-        }
-        for (const key of Object.keys(field)) {
-          if (!['id', 'label', 'type'].includes(key)) {
-            return res.status(400).json({
-              error: `'${key}' is not a valid field key`
-            })
-          }
-        }
-        for (const requiredKey of ['id', 'label', 'type']) {
-          if (!Object.keys(field).includes(requiredKey)) {
-            return res.status(400).json({
-              error: `'${requiredKey}' is missing from field`
-            })
-          }
-        }
+        const payload = FormService.prepareForm(newForm);
+        return res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${newForm.id}`))
+          .json(payload);
+      } catch (error) {
+        next(error);
       }
-
-      const newForm = await FormService.postNewForm(
-        db,
-        req.user.id,
-        {
-          name,
-          description,
-          fields
-        })
-      const payload = FormService.prepareForm(newForm);
-      return res
-        .status(201)
-        .json(payload);
-    } catch (error) {
-      next(error)
-    }
-  })
+    });
+formRouter
+  .patch('/:form_id',
+    jsonBodyParser,
+    validateFormFields,
+    async (req, res, next) => {
+      const db = req.app.get('db');
+      try {
+        const { form_id } = req.params;
+        if (!form_id)
+          return res
+            .status(404)
+            .send();
+        const { name, description, fields } = req.body;
+        const updatedForm = await FormService.updateForm(db,
+          form_id,
+          {
+            name,
+            description,
+            fields
+          });
+        const payload = FormService.prepareForm(updatedForm);
+        return res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${updatedForm.id}`))
+          .json(payload);
+      } catch (error) {
+        next(error);
+      }
+    });
 
 module.exports = formRouter;

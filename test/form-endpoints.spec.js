@@ -69,7 +69,7 @@ describe('Form Endpoints', function () {
   /**
    * @description Post a new Form
    **/
-  describe.only('POST /api/form', () => {
+  describe('POST /api/form', () => {
     const requiredFields = ['name', 'fields'];
 
     it('responds with 401 unauthorized when no auth header set', () => {
@@ -213,6 +213,64 @@ describe('Form Endpoints', function () {
               );
           });
       });
+    });
+  });
+
+  /**
+  * @description Update a Form
+  **/
+  describe.only('PATCH /api/form', () => {
+    describe('given a valid requrest', () => {
+      const patchAttemptBody = {
+        fields: [
+          {
+            id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
+            label: 'ChangedLabel',
+            type: 'string'
+          },
+          {
+            id: '2888aa74-4eef-11eb-b544-9ff93ffc6d13',
+            label: 'labelTwo',
+            type: 'number'
+          }
+        ],
+        description: 'this form was updated'
+      }
+      const formId = 1;
+      it('returns 201 and a new form', () =>
+        supertest(app)
+          .patch(`/api/form/${formId}`)
+          .set(auth)
+          .send(patchAttemptBody)
+          .expect(201)
+          .then(res =>
+            db
+              .from('form')
+              .select('*')
+              .where({ id: res.body.id })
+              .first()
+              .then(row => {
+                expect(row.description).to.eql(patchAttemptBody.description);
+                expect(row.fields).to.eql(patchAttemptBody.fields);
+              })
+          )
+      );
+      it('hides the old form', () => {
+        return supertest(app)
+          .patch(`/api/form/${formId}`)
+          .set(auth)
+          .send(patchAttemptBody)
+          .then(() =>
+            db
+              .from('form')
+              .select('hidden')
+              .where({ id: formId })
+              .first()
+              .then(res => {
+                expect(res.hidden).to.be.true;
+              })
+          )
+      })
     });
   });
 });
