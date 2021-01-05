@@ -16,7 +16,7 @@ VALUES
 INSERT INTO "form" ("id", "id_user")
 VALUES (1, 1);
 
-INSERT INTO "form_version" ("id", "name", "fields", "description", "id_form")
+INSERT INTO "form_version" ("id", "name", "fields", "description", "id_form", "latest")
 VALUES 
   (
     1,
@@ -46,7 +46,8 @@ VALUES
       }
     ]',
     'An example form',
-    1
+    1,
+    false
   ),
   (
     2,
@@ -76,7 +77,8 @@ VALUES
       }
     ]',
     'Example form update',
-    1
+    1,
+    true
   );
 
 INSERT INTO "record" ("id", "values", "id_form_version")
