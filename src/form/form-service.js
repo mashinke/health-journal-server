@@ -3,16 +3,31 @@ const xss = require("xss")
 const FormService = {
   postNewForm(db, id_user, formData) {
     const { fields, name, description } = formData;
-    return db
-      .into('form')
-      .insert({
-        name,
-        description,
-        id_user,
-        fields: JSON.stringify(fields)
-      })
-      .returning('*')
-      .then(rows => rows[0]);
+    return db.transaction(async trx => {
+      const id_form = await db.into('form')
+        .insert({ id_user })
+        .transacting(trx)
+        .returning('id')
+        .then(rows => rows[0]);
+
+      const newFormVersion = await db
+        .into('form_version')
+        .transacting(trx)
+        .insert({
+          fields: JSON.stringify(fields),
+          name,
+          description,
+          id_form
+        })
+        .returning(['name', 'description', 'fields'])
+        .then(rows => rows[0]);
+
+      return {
+        ...newFormVersion,
+        id: id_form
+      }
+    });
+
   },
 
   updateForm(db, id_form, formData) {
