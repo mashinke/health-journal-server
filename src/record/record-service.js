@@ -2,10 +2,20 @@ const xss = require("xss");
 
 const RecordService = {
   postNewRecord(db, id_form, values) {
-    return db
-      .into('record')
-      .insert({ id_form, values })
-      .returning('*')
+    return db.transaction(async trx => {
+      const id_form_version = await db
+        .from('form_version')
+        .transacting(trx)
+        .select('id')
+        .where({ id_form, latest: true })
+        .first()
+        .then(res => res.id);
+
+      return db
+        .into('record')
+        .insert({ id_form_version, values })
+        .returning('*')
+    })
       .then(rows => rows[0]);
   },
   getUserRecords(db, id_user) {
@@ -13,8 +23,11 @@ const RecordService = {
       .from('form')
       .where({ id_user })
       .select()
+      .join('form_version', function () {
+        this.on('form.id', 'form_version.id_form')
+      })
       .join('record', function () {
-        this.on('form.id', 'record.id_form')
+        this.on('form_version.id', 'record.id_form_version')
       })
   },
   prepareRecord(record) {

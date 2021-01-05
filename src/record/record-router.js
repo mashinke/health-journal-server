@@ -26,9 +26,9 @@ recordRouter
       const db = req.app.get('db');
 
       // validate formId
-      const userForm = await FormService.getUserForm(db, req.user.id, formId);
+      const latestUserForm = await FormService.getUserFormLatest(db, req.user.id, formId);
 
-      if (!userForm)
+      if (!latestUserForm)
         return res.status(400).json({
           error: `Form ID ${formId} not found for user ${req.user.username}`
         });
@@ -37,7 +37,7 @@ recordRouter
         name,
         description,
         fields,
-      } = userForm
+      } = latestUserForm
 
       // validate body format
       const ids = [];

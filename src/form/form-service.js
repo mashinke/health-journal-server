@@ -36,7 +36,8 @@ const FormService = {
           name: oldForm.name,
           description: oldForm.description,
           fields: JSON.stringify(oldForm.fields),
-          id_user: 1
+          id_user: 1,
+          replaces: id_form
         })
         .returning('id')
         .then(rows => rows[0]);
@@ -53,60 +54,27 @@ const FormService = {
         .then(rows => rows[0]);
       return newForm;
     })
-
-    //   const newForm =
-    //     // .transacting(trx)
-    //     .update({
-    //     name: formData.name,
-    //     description: formData.description,
-    //     fields: JSON.stringify(formData.fields)
-    //   })
-    //       .returning('*')
-    //       .then(rows => rows[0]);
-
-    //   return newForm;
-    // })
-
-    // const form = await db
-    //   .from('form')
-    //   .select('name', 'description', 'fields', 'id_user')
-    //   .where({ id: id_form })
-    //   .first();
-    // for (field of ['name', 'description']) {
-    //   if (formData[field] !== undefined)
-    //     form[field] = formData[field];
-    // }
-    // if (formData.fields) {
-    //   form.fields = JSON.stringify(formData.fields);
-    // } else {
-    //   form.fields = JSON.stringify(form.fields);
-    // }
-    // const newForm = await db
-    //   .into('form')
-    //   .insert(form)
-    //   .returning('*');
-    // await db('form')
-    //   .where({ id: id_form })
-    //   .update({ hidden: true })
-    // return newForm[0];
   },
 
-  getUserForm(db, id_user, id) {
+  getUserFormLatest(db, id_user, id_form) {
     return db
       .from('form')
-      .select('name', 'description', 'fields')
-      .where({ id_user, id })
-      .first()
-      .then(res => {
-        return res
+      .join('form_version', function () {
+        this.on('form.id', 'form_version.id_form')
       })
+      .where({ id_user, id_form, latest: true })
+      .select('name', 'description', 'fields')
+      .first();
   },
 
   getUserForms(db, id_user) {
     return db
       .from('form')
-      .select('*')
-      .where({ id_user, hidden: false })
+      .join('form_version', function () {
+        this.on('form.id', 'form_version.id_form')
+      })
+      .where({ id_user, latest: true })
+      .select('name', 'description', 'fields', 'form.id')
       .then(res => {
         return res
       })
