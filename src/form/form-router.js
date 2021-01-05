@@ -59,25 +59,50 @@ formRouter
       }
     });
 formRouter
-  .patch('/:form_id',
+  .patch('/:formId',
     jsonBodyParser,
     validateFormFields,
     async (req, res, next) => {
       const db = req.app.get('db');
       try {
-        const { form_id } = req.params;
-        if (!form_id)
+        let { formId } = req.params;
+        formId = Number(formId);
+
+        if (!formId) {
+          return res
+            .status(400)
+            .json({
+              error: 'Invalid form id'
+            })
+        }
+
+        const latestFormVersion =
+          await FormService.getUserFormLatest(db, req.user.id, formId);
+
+        if (!latestFormVersion)
           return res
             .status(404)
-            .send();
+            .json({
+              error: `Form id ${formId} not found`
+            })
+
+        for ([key, value] of Object.entries(latestFormVersion)) {
+          if (req.body[key] === undefined) {
+            req.body[key] = value;
+          }
+        }
+
         const { name, description, fields } = req.body;
+
         const updatedForm = await FormService.updateForm(db,
-          form_id,
+          formId,
           {
             name,
             description,
             fields
-          });
+          }
+        );
+
         const payload = FormService.prepareForm(updatedForm);
         return res
           .status(201)

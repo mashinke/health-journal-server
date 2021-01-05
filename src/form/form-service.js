@@ -17,42 +17,29 @@ const FormService = {
 
   updateForm(db, id_form, formData) {
     return db.transaction(async trx => {
-      const oldForm = await db
-        .from('form')
+      await db
+        .from('form_version')
         .transacting(trx)
-        .select('name', 'description', 'fields', 'id_user')
-        .where({ id: id_form })
-        .first();
+        .where({ id_form, latest: true })
+        .update({ latest: false });
 
-      await db('form')
-        .transacting(trx)
-        .update({ hidden: true })
-        .where({ id: id_form })
-
-      const newFormId = await db
-        .into('form')
+      const newFormVersion = await db
+        .into('form_version')
         .transacting(trx)
         .insert({
-          name: oldForm.name,
-          description: oldForm.description,
-          fields: JSON.stringify(oldForm.fields),
-          id_user: 1,
-          replaces: id_form
-        })
-        .returning('id')
-        .then(rows => rows[0]);
-
-      const newForm = await db('form')
-        .transacting(trx)
-        .where({ id: newFormId })
-        .update({
           name: formData.name,
           description: formData.description,
-          fields: JSON.stringify(formData.fields)
+          fields: JSON.stringify(formData.fields),
+          id_form,
+          latest: true
         })
-        .returning('*')
+        .returning(['name', 'description', 'fields'])
         .then(rows => rows[0]);
-      return newForm;
+
+      return {
+        ...newFormVersion,
+        id: id_form
+      }
     })
   },
 
