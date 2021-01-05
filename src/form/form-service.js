@@ -71,15 +71,12 @@ const FormService = {
 
   getUserForms(db, id_user) {
     return db
-      .from('form')
+      .from('form_version')
       .join('form_version', function () {
         this.on('form.id', 'form_version.id_form')
       })
       .where({ id_user, latest: true })
       .select('name', 'description', 'fields', 'form.id')
-      .then(res => {
-        return res
-      })
   },
 
   prepareForm(form) {
