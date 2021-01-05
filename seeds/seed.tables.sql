@@ -1,7 +1,7 @@
 BEGIN;
 
 TRUNCATE
-  "user", "form", "record_tag", "record", "tag";
+  "user", "form_version", "form", "record_tag", "record", "tag";
 
 INSERT INTO "user" ("id", "email", "username", "password")
 VALUES
@@ -13,7 +13,10 @@ VALUES
     '$2a$10$fCWkaGbt7ZErxaxclioLteLUgg4Q3Rp09WW0s/wSLxDKYsaGYUpjG'
   );
 
-INSERT INTO "form" ("id", "name", "fields", "description", "id_user")
+INSERT INTO "form" ("id", "id_user")
+VALUES (1, 1);
+
+INSERT INTO "form_version" ("id", "name", "fields", "description", "id_form")
 VALUES 
   (
     1,
@@ -47,7 +50,7 @@ VALUES
   ),
   (
     2,
-    'Example Form 2',
+    'Example Form (Updated)',
     '[
       {
         "id": "2888ab0a-4ec2-11eb-b547-c3bbef39ea72",
@@ -72,11 +75,11 @@ VALUES
         "type": "boolean"
       }
     ]',
-    'Another example form',
+    'Example form update',
     1
   );
 
-INSERT INTO "record" ("id", "values", "id_form")
+INSERT INTO "record" ("id", "values", "id_form_version")
 VALUES 
   (
     1,
@@ -103,6 +106,7 @@ VALUES
 -- update the sequencer for future automatic id setting
 SELECT setval('user_id_seq', (SELECT MAX(id) from "user"));
 SELECT setval('form_id_seq', (SELECT MAX(id) from "form"));
+SELECT setval('form_version_id_seq', (SELECT MAX(id) from "form_version"));
 SELECT setval('record_id_seq', (SELECT MAX(id) from "record"));
 
 COMMIT;
