@@ -1,5 +1,5 @@
 BEGIN;
 
-DROP TABLE "form", "record", "tag", "record_tag";
+DROP TABLE "form_version", "form", "record", "tag", "record_tag";
 
 COMMIT;

@@ -1,7 +1,8 @@
 BEGIN;
 
 CREATE TABLE "form" (
-  "id" SERIAL PRIMARY KEY
+  "id" SERIAL PRIMARY KEY,
+  "id_user" INTEGER REFERENCES "user"(id) NOT NULL
 );
 
 CREATE TABLE "form_version" (
@@ -10,8 +11,7 @@ CREATE TABLE "form_version" (
   "description" TEXT,
   "fields" JSONB NOT NULL,
   "latest" BOOL DEFAULT true,
-  "id_form" INTEGER REFERENCES "form"(id) NOT NULL,
-  "id_user" INTEGER REFERENCES "user"(id) NOT NULL
+  "id_form" INTEGER REFERENCES "form"(id) NOT NULL
 );
 
 CREATE TABLE "record" (
