@@ -52,6 +52,10 @@ recordRouter
             && values[id] <= field.max
             && values[id] >= field.min
           )
+          && !(
+            type === 'time'
+            && values[id].match(/^\d{1,2}:\d{2}([ap]m)?$/) // time format h:m
+          )
           && !(typeof values[id] === type)
         )
           return res.status(400).json({

@@ -4,7 +4,7 @@ function validateFormFields(req, res, next) {
     return next();
 
   for (const field of fields) {
-    if (!['string', 'number', 'boolean', 'range'].includes(field.type)) {
+    if (!['string', 'number', 'boolean', 'range', 'time'].includes(field.type)) {
 
       return res.status(400).json({
         error: `'${field.type}' is not a valid field type`
