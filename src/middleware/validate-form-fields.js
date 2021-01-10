@@ -11,7 +11,7 @@ function validateFormFields(req, res, next) {
       })
     }
     for (const key of Object.keys(field)) {
-      if (!['id', 'label', 'type'].includes(key)) {
+      if (!['id', 'label', 'type', 'min', 'max'].includes(key)) {
         return res.status(400).json({
           error: `'${key}' is not a valid field key`
         })

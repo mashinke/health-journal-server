@@ -41,6 +41,8 @@ formRouter
           }
         }
 
+        console.log('fields', fields)
+
         const newForm = await FormService.postNewForm(
           db,
           req.user.id,
@@ -49,6 +51,8 @@ formRouter
             description,
             fields
           })
+
+        console.log('newForm', newForm)
         const payload = FormService.prepareForm(newForm);
         return res
           .status(201)
