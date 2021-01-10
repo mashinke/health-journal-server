@@ -30,6 +30,12 @@ const RecordService = {
         this.on('form_version.id', 'record.id_form_version')
       })
   },
+  deleteUserRecord(db, id) {
+    return db
+      .from('record')
+      .where({ id })
+      .del()
+  },
   prepareRecord(record) {
     const { id, created, id_form } = record;
     const name = xss(record.name);

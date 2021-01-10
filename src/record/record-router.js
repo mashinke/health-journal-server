@@ -94,4 +94,19 @@ recordRouter
     }
   });
 
+recordRouter
+  .delete('/:id_record', async (req, res, next) => {
+    const db = req.app.get('db');
+    const { id_record } = req.params;
+    try {
+      const deletedRows = await RecordService.deleteUserRecord(db, id_record)
+      if (deletedRows === 0)
+        return res.status(404).send();
+
+      return res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  });
+
 module.exports = recordRouter;
