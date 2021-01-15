@@ -29,6 +29,7 @@ const RecordService = {
       .join('record', function () {
         this.on('form_version.id', 'record.id_form_version')
       })
+      .orderBy('record.created')
   },
   deleteUserRecord(db, id) {
     return db
