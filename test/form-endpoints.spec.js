@@ -8,6 +8,7 @@ describe('Form Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
+  const testFormVersions = helpers.makeFormVersionsArray();
   const testForms = helpers.makeFormsArray();
   const testRecords = helpers.makeRecordsArray();
 
@@ -29,6 +30,7 @@ describe('Form Endpoints', function () {
       db,
       testUsers,
       testForms,
+      testFormVersions,
       testRecords
     )
   );
@@ -204,9 +206,9 @@ describe('Form Endpoints', function () {
           .send(postAttemptBody)
           .then(res => {
             return db
-              .from('form')
+              .from('form_version')
               .select('fields')
-              .where({ id: res.body.id })
+              .where({ id_form: res.body.id, latest: true })
               .first()
               .then(row =>
                 expect(row.fields).to.eql(postAttemptBody.fields)
@@ -219,7 +221,7 @@ describe('Form Endpoints', function () {
   /**
   * @description Update a Form
   **/
-  describe.only('PATCH /api/form', () => {
+  describe('PATCH /api/form', () => {
     describe('given a valid requrest', () => {
       const patchAttemptBody = {
         fields: [
@@ -237,17 +239,17 @@ describe('Form Endpoints', function () {
         description: 'this form was updated'
       }
       const formId = 1;
-      it('returns 201 and a new form', () =>
+      it('returns 200 and inserts the updated version in db', () =>
         supertest(app)
           .patch(`/api/form/${formId}`)
           .set(auth)
           .send(patchAttemptBody)
-          .expect(201)
+          .expect(200)
           .then(res =>
             db
-              .from('form')
+              .from('form_version')
               .select('*')
-              .where({ id: res.body.id })
+              .where({ id_form: res.body.id, latest: true })
               .first()
               .then(row => {
                 expect(row.description).to.eql(patchAttemptBody.description);
@@ -255,22 +257,6 @@ describe('Form Endpoints', function () {
               })
           )
       );
-      it('hides the old form', () => {
-        return supertest(app)
-          .patch(`/api/form/${formId}`)
-          .set(auth)
-          .send(patchAttemptBody)
-          .then(() =>
-            db
-              .from('form')
-              .select('hidden')
-              .where({ id: formId })
-              .first()
-              .then(res => {
-                expect(res.hidden).to.be.true;
-              })
-          )
-      })
     });
   });
 });

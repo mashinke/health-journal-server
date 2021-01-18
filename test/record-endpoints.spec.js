@@ -8,10 +8,12 @@ describe('Record Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
+  const testFormVersions = helpers.makeFormVersionsArray();
   const testForms = helpers.makeFormsArray();
   const testRecords = helpers.makeRecordsArray();
 
   const testForm = testForms[0];
+  const testFormVersion = testFormVersions[0];
   const testUser = testUsers[0];
   const auth = { Authorization: helpers.makeAuthHeader(testUser) };
 
@@ -29,6 +31,7 @@ describe('Record Endpoints', function () {
       db,
       testUsers,
       testForms,
+      testFormVersions,
       testRecords
     )
   );
@@ -171,7 +174,7 @@ describe('Record Endpoints', function () {
           .expect(201)
           .expect(res => {
             expect(res.body).to.have.property('id');
-            expect(res.body.name).to.eql(testForm.name);
+            expect(res.body.name).to.eql(testFormVersion.name);
             expect(res.body.values).to.eql(postAttemptBody.values);
             expect(res.body.fields).to.eql(fields);
             expect(res.headers.location).to.eql(`/api/record/${res.body.id}`);
@@ -227,6 +230,22 @@ describe('Record Endpoints', function () {
             )
           );
         });
+    });
+  });
+  /**
+   * Delete a record
+   **/
+  describe('DELETE /api/record', () => {
+    it('responds with 401 unauthorized when no auth header set', () => {
+      return supertest(app)
+        .get('/api/record')
+        .expect(401, {
+          error: 'Missing bearer token'
+        })
+    });
+
+    it('deletes the record', () => {
+
     });
   });
 });

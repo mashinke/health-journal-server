@@ -94,7 +94,6 @@ formRouter
         }
 
         const { name, description, fields } = req.body;
-
         const updatedForm = await FormService.updateForm(db,
           formId,
           {
@@ -106,8 +105,7 @@ formRouter
 
         const payload = FormService.prepareForm(updatedForm);
         return res
-          .status(201)
-          .location(path.posix.join(req.originalUrl, `/${updatedForm.id}`))
+          .status(200)
           .json(payload);
       } catch (error) {
         next(error);

@@ -38,6 +38,15 @@ function makeFormsArray() {
   return [
     {
       id: 1,
+      id_user: 1
+    }
+  ]
+}
+
+function makeFormVersionsArray() {
+  return [
+    {
+      id: 1,
       name: 'test-form-1',
       fields: JSON.stringify(
         [
@@ -66,7 +75,7 @@ function makeFormsArray() {
         ]
       ),
       description: 'test description',
-      id_user: 1
+      id_form: 1
     },
   ]
 }
@@ -81,7 +90,7 @@ function makeRecordsArray() {
         '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
         '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 3
       }),
-      id_form: 1,
+      id_form_version: 1,
     },
     {
       id: 2,
@@ -91,7 +100,7 @@ function makeRecordsArray() {
         '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
         '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 5
       }),
-      id_form: 1
+      id_form_version: 1
     },
   ]
 }
@@ -122,6 +131,7 @@ function cleanTables(db) {
         "record_tag",
         "tag",
         "record",
+        "form_version",
         "form",
         "user"`
     )
@@ -129,11 +139,13 @@ function cleanTables(db) {
         Promise.all([
           trx.raw('ALTER SEQUENCE user_id_seq minvalue 0 START WITH 1'),
           trx.raw('ALTER SEQUENCE form_id_seq minvalue 0 START WITH 1'),
+          trx.raw('ALTER SEQUENCE form_version_id_seq minvalue 0 START WITH 1'),
           trx.raw('ALTER SEQUENCE record_id_seq minvalue 0 START WITH 1'),
           trx.raw('ALTER SEQUENCE tag_id_seq minvalue 0 START WITH 1'),
           trx.raw('ALTER SEQUENCE record_tag_id_seq minvalue 0 START WITH 1'),
           trx.raw('SELECT setval(\'user_id_seq\', 0)'),
           trx.raw('SELECT setval(\'form_id_seq\', 0)'),
+          trx.raw('SELECT setval(\'form_version_id_seq\', 0)'),
           trx.raw('SELECT setval(\'record_id_seq\', 0)'),
           trx.raw('SELECT setval(\'tag_id_seq\', 0)'),
           trx.raw('SELECT setval(\'record_tag_id_seq\', 0)'),
@@ -163,17 +175,21 @@ function seedUsers(db, users) {
   });
 }
 
-async function seedUsersFormsRecords(db, users, forms, records) {
+async function seedUsersFormsRecords(db, users, forms, form_versions, records) {
   await seedUsers(db, users);
-
   await db.transaction(async trx => {
     await trx.into('form').insert(forms);
-    await trx.into('record').insert(records)
+    await trx.into('form_version').insert(form_versions);
+    await trx.into('record').insert(records);
 
     await Promise.all([
       trx.raw(
         'SELECT setval(\'form_id_seq\', ?)',
         [forms[forms.length - 1].id],
+      ),
+      trx.raw(
+        'SELECT setval(\'form_version_id_seq\', ?)',
+        [form_versions[form_versions.length - 1].id],
       ),
       trx.raw(
         'SELECT setval(\'record_id_seq\', ?)',
@@ -187,6 +203,7 @@ module.exports = {
   makeKnexInstance,
   makeUsersArray,
   makeRecordsArray,
+  makeFormVersionsArray,
   makeFormsArray,
   makeAuthHeader,
   cleanTables,
