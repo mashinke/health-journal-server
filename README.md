@@ -4,6 +4,8 @@ This repository is for the
 RESTFul API server. To learn more about the application, please visit the 
 [client repository on GitHub](https://github.com/mashinke/health-journal-client).
 
+Visit the [live app](https://health-journal.vercel.app/)
+
 ## Technology
 This project was developed with [__Node.js__](https://nodejs.org/) + [__Express.js__](http://expressjs.com/) + [__Knex.js__](https://knexjs.org/) + [__Postgresql__](https://www.postgresql.org/) 
 on the back end, and [__React__](https://reactjs.org/) + [__styled-components__](https://styled-components.com/) on the front end. The server is deployed on 
