@@ -72,7 +72,7 @@ recordRouter
       // postNewRecord() doesn't join with form, so we add the properties here
       Object.assign(newRecord, { name, description, fields, id_form: formId });
       const payload = RecordService.prepareRecord(newRecord);
-      console.log(payload)
+
       return res
         .status(201)
         .location(path.posix.join(req.originalUrl, `/${newRecord.id}`))
