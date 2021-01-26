@@ -1,0 +1,52 @@
+{
+  "env": {
+    "commonjs": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb-base",
+    "plugin:node/recommended"
+  ],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "func-names": "off",
+    "no-process-exit": "off",
+    "class-methods-use-this": "off",
+    "consistent-return": "off"
+  },
+  "overrides": [
+    {
+      "files": [
+        "*-service.js"
+      ],
+      "rules": {
+        "camelcase": "off"
+      }
+    },
+    {
+      "files": [
+        "test/*"
+      ],
+      "env": {
+        "mocha": true
+      },
+      "rules": {
+        "func-names": "off",
+        "prefer-arrow-callback": "off",
+        "node/no-unpublished-require": "off",
+        "camelcase": "warn"
+      },
+      "globals": {
+        "expect": true,
+        "supertest": true
+      }
+    }
+  ]
+}
