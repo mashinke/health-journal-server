@@ -11,33 +11,36 @@ authRouter
     const { email, password } = req.body;
     const loginUser = { email, password };
 
-    for (const [key, value] of Object.entries(loginUser))
-      // eslint-disable-next-line eqeqeq
-      if (value == null)
-        return res.status(400).json({
-          error: `Missing '${key}' in request body`
-        });
+    const [nullValueKey] = Object.entries(loginUser).find(([, value]) => value == null) || [];
+
+    if (nullValueKey) {
+      return res.status(400).json({
+        error: `Missing '${nullValueKey}' in request body`,
+      });
+    }
 
     try {
       const dbUser = await AuthService.getUserWithEmail(
         req.app.get('db'),
-        loginUser.email
+        loginUser.email,
       );
 
-      if (!dbUser)
+      if (!dbUser) {
         return res.status(400).json({
           error: 'Incorrect email or password',
         });
+      }
 
       const compareMatch = await AuthService.comparePasswords(
         loginUser.password,
-        dbUser.password
+        dbUser.password,
       );
 
-      if (!compareMatch)
+      if (!compareMatch) {
         return res.status(400).json({
           error: 'Incorrect email or password',
         });
+      }
 
       const sub = dbUser.email;
       const payload = {
