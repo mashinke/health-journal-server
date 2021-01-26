@@ -12,15 +12,17 @@ recordRouter
 
 recordRouter
   .post('/', jsonBodyParser, async (req, res, next) => {
-    const { formId, values } = req.body;
     try {
-      for (const key of ['formId', 'values']) {
-        const value = req.body[key];
-        if (value == null) {
-          return res.status(400).json({
-            error: `Missing '${key}' in request body`
-          });
-        }
+      const { formId, values } = req.body;
+      const newRecordData = { formId, values };
+
+      const [nullKey] = Object.entries(newRecordData)
+        .find(([, value]) => value == null) || [];
+
+      if (nullKey) {
+        return res.status(400).json({
+          error: `Missing '${nullKey}' in request body`,
+        });
       }
 
       const db = req.app.get('db');
@@ -28,49 +30,58 @@ recordRouter
       // validate formId
       const latestUserForm = await FormService.getUserFormLatest(db, req.user.id, formId);
 
-      if (!latestUserForm)
+      if (!latestUserForm) {
         return res.status(400).json({
-          error: `Form ID ${formId} not found for user ${req.user.username}`
+          error: `Form ID ${formId} not found for user ${req.user.username}`,
         });
+      }
 
       const {
         name,
         description,
         fields,
-      } = latestUserForm
+      } = latestUserForm;
 
       // validate body format
-      const ids = [];
+      const fieldReference = fields.reduce((hash, {
+        id, min, max, type,
+      }) => Object.assign(hash, { [id]: { min, max, type } }), {});
+      let error = null;
 
-      for (const field of fields) {
-        const { id, type } = field;
-        ids.push(id);
+      Object.entries(values).every(([id, value]) => {
+        if (fieldReference[id] === undefined) {
+          error = 'Malformed request, record body does not match form specifications';
+          return false;
+        }
+        const { type, min, max } = fieldReference[id];
+        const valueType = typeof value;
+
         if (
-          !(values[id] === undefined) // no required fields atm
+          !(value === undefined) // no required fields atm
           && !(
             type === 'range'
-            && values[id] <= field.max
-            && values[id] >= field.min
+            && value <= max
+            && value >= min
           )
           && !(
             type === 'time'
-            && values[id].match(/^\d{1,2}:\d{2}([ap]m)?$/) // time format h:m
+            && value.match(/^\d{1,2}:\d{2}([ap]m)?$/) // time format h:m
           )
-          && !(typeof values[id] === type)
-        )
-          return res.status(400).json({
-            error: 'Malformed request, record body does not match form specifications'
-          });
-      }
-      for (id of Object.keys(values)) {
-        if (!ids.includes(id))
-          return res.status(400).json({
-            error: 'Malformed request, record body does not match form specifications'
-          })
-      }
+          && !(valueType === type)
+        ) {
+          error = 'Malformed request, record body does not match form specifications';
+          return false;
+        }
+        return true;
+      });
+
+      if (error) return res.status(400).json({ error });
+
       const newRecord = await RecordService.postNewRecord(db, formId, values);
       // postNewRecord() doesn't join with form, so we add the properties here
-      Object.assign(newRecord, { name, description, fields, id_form: formId });
+      Object.assign(newRecord, {
+        name, description, fields, id_form: formId,
+      });
       const payload = RecordService.prepareRecord(newRecord);
 
       return res
@@ -86,7 +97,7 @@ recordRouter
   .get('/', async (req, res, next) => {
     const db = req.app.get('db');
     try {
-      const userRecords = await RecordService.getUserRecords(db, req.user.id)
+      const userRecords = await RecordService.getUserRecords(db, req.user.id);
       const payload = userRecords.map(RecordService.prepareRecord);
 
       return res.status(200).send(payload.reverse());
@@ -96,13 +107,12 @@ recordRouter
   });
 
 recordRouter
-  .delete('/:id_record', async (req, res, next) => {
+  .delete('/:recordId', async (req, res, next) => {
     const db = req.app.get('db');
-    const { id_record } = req.params;
+    const { recordId } = req.params;
     try {
-      const deletedRows = await RecordService.deleteUserRecord(db, id_record)
-      if (deletedRows === 0)
-        return res.status(404).send();
+      const deletedRows = await RecordService.deleteUserRecord(db, recordId);
+      if (deletedRows === 0) return res.status(404).send();
 
       return res.status(204).send();
     } catch (error) {
