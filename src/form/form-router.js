@@ -15,7 +15,7 @@ formRouter
     const db = req.app.get('db');
     try {
       const userForms = await FormService.getUserForms(db, req.user.id);
-      const payload = userForms.map(form => FormService.prepareForm(form));
+      const payload = userForms.map((form) => FormService.prepareForm(form));
 
       return res.status(200).send(payload);
     } catch (error) {
@@ -31,24 +31,22 @@ formRouter
       const db = req.app.get('db');
       try {
         const { name, description, fields } = req.body;
+        const newFormData = { name, description, fields };
 
-        for (const key of ['name', 'fields']) {
-          const value = req.body[key];
-          if (value == null) {
-            return res.status(400).json({
-              error: `Missing '${key}' in request body`
-            });
-          }
+        const [nullKey] = Object.entries(newFormData)
+          .find(([key, value]) => (value == null) && key !== 'description') || [];
+
+        if (nullKey) {
+          return res.status(400).json({
+            error: `Missing '${nullKey}' in request body`,
+          });
         }
 
         const newForm = await FormService.postNewForm(
           db,
           req.user.id,
-          {
-            name,
-            description,
-            fields
-          })
+          newFormData,
+        );
 
         const payload = FormService.prepareForm(newForm);
         return res
@@ -73,25 +71,25 @@ formRouter
           return res
             .status(400)
             .json({
-              error: 'Invalid form id'
-            })
+              error: 'Invalid form id',
+            });
         }
 
-        const latestFormVersion =
-          await FormService.getUserFormLatest(db, req.user.id, formId);
+        const latestFormVersion = await FormService.getUserFormLatest(db, req.user.id, formId);
 
-        if (!latestFormVersion)
+        if (!latestFormVersion) {
           return res
             .status(404)
             .json({
-              error: `Form id ${formId} not found`
-            })
+              error: `Form id ${formId} not found`,
+            });
+        }
 
-        for ([key, value] of Object.entries(latestFormVersion)) {
+        Object.entries(latestFormVersion).forEach(([key, value]) => {
           if (req.body[key] === undefined) {
             req.body[key] = value;
           }
-        }
+        });
 
         const { name, description, fields } = req.body;
         const updatedForm = await FormService.updateForm(db,
@@ -99,9 +97,8 @@ formRouter
           {
             name,
             description,
-            fields
-          }
-        );
+            fields,
+          });
 
         const payload = FormService.prepareForm(updatedForm);
         return res
