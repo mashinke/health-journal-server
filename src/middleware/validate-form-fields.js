@@ -1,30 +1,37 @@
 function validateFormFields(req, res, next) {
   const { fields } = req.body;
-  if (fields === undefined)
-    return next();
+  if (fields === undefined) return next();
 
-  for (const field of fields) {
-    if (!['string', 'number', 'boolean', 'range', 'time'].includes(field.type)) {
+  const fieldTypes = ['string', 'number', 'boolean', 'range', 'time'];
+  const fieldProperties = ['id', 'label', 'type', 'min', 'max'];
+  const requiredKeys = ['id', 'label', 'type'];
 
-      return res.status(400).json({
-        error: `'${field.type}' is not a valid field type`
+  let error = null;
+  fields.every((field) => {
+    const fieldKeys = Object.keys(field);
+    if (!fieldTypes.includes(field.type)) {
+      error = `'${field.type}' is not a valid field type`;
+      return false;
+    }
+    return (
+      fieldKeys.every((key) => {
+        if (!fieldProperties.includes(key)) {
+          error = `'${key}' is not a valid field key`;
+          return false;
+        }
+        return true;
       })
-    }
-    for (const key of Object.keys(field)) {
-      if (!['id', 'label', 'type', 'min', 'max'].includes(key)) {
-        return res.status(400).json({
-          error: `'${key}' is not a valid field key`
-        })
-      }
-    }
-    for (const requiredKey of ['id', 'label', 'type']) {
-      if (!Object.keys(field).includes(requiredKey)) {
-        return res.status(400).json({
-          error: `'${requiredKey}' is missing from field`
-        })
-      }
-    }
-  }
+      && requiredKeys.every((requiredKey) => {
+        if (!fieldKeys.includes(requiredKey)) {
+          error = `'${requiredKey}' is missing from field`;
+          return false;
+        }
+        return true;
+      })
+    );
+  });
+
+  if (error) return res.status(400).json({ error });
   next();
 }
 

@@ -4,12 +4,10 @@ const AuthService = require('../auth/auth-service');
 async function requireAuth(req, res, next) {
   const authToken = req.get('Authorization') || '';
 
-  let bearerToken;
   if (!authToken.toLowerCase().startsWith('bearer ')) {
     return res.status(401).json({ error: 'Missing bearer token' });
-  } else {
-    bearerToken = authToken.slice(7, authToken.length);
   }
+  const bearerToken = authToken.slice(7, authToken.length);
 
   try {
     const payload = AuthService.verifyJwt(bearerToken);
@@ -19,14 +17,15 @@ async function requireAuth(req, res, next) {
       payload.sub,
     );
 
-    if (!user)
-      return res.status(401).json({ error: 'Unauthorized request' });
+    if (!user) return res.status(401).json({ error: 'Unauthorized request' });
 
     req.user = user;
     next();
   } catch (error) {
-    if (error instanceof JsonWebTokenError)
-      return res.status(401).json({ error: 'Unauthorized request' });
+    if (error instanceof JsonWebTokenError) {
+      return res
+        .status(401).json({ error: 'Unauthorized request' });
+    }
 
     next(error);
   }
