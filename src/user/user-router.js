@@ -8,31 +8,32 @@ const jsonBodyParser = express.json();
 userRouter
   .post('/', jsonBodyParser, async (req, res, next) => {
     const { password, username, email } = req.body;
+    const newUserData = { password, username, email };
 
-    for (const field of ['email', 'username', 'password'])
-      if (!req.body[field])
-        return res.status(400).json({
-          error: `Missing '${field}' in request body`
-        });
+    const [nullKey] = Object.entries(newUserData)
+      .find(([, value]) => value == null) || [];
+
+    if (nullKey) {
+      return res.status(400).json({
+        error: `Missing '${nullKey}' in request body`,
+      });
+    }
 
     try {
       const passwordError = UserService.validatePassword(password);
 
-      if (passwordError)
-        return res.status(400).json({ error: passwordError });
+      if (passwordError) return res.status(400).json({ error: passwordError });
 
       const hasUserWithEmail = await UserService.hasUserWithEmail(
         req.app.get('db'),
-        email
+        email,
       );
 
-      if (hasUserWithEmail)
-        return res.status(400).json({ error: 'Email already taken' });
+      if (hasUserWithEmail) return res.status(400).json({ error: 'Email already taken' });
 
       const invalidEmail = !UserService.validateEmail(email);
 
-      if (invalidEmail)
-        return res.status(400).json({ error: 'Invalid email address' });
+      if (invalidEmail) return res.status(400).json({ error: 'Invalid email address' });
 
       const hashedPassword = await UserService.hashPassword(password);
 
@@ -44,7 +45,7 @@ userRouter
 
       const user = await UserService.insertUser(
         req.app.get('db'),
-        newUser
+        newUser,
       );
 
       res
