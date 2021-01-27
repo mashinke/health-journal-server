@@ -37,11 +37,12 @@ describe('Form Endpoints', function () {
    * @description Get an array of a user's Forms
    * */
   describe('GET /api/form', () => {
-    it('responds with 401 unauthorized when no auth header set', () => supertest(app)
-      .get('/api/form')
-      .expect(401, {
-        error: 'Missing bearer token',
-      }));
+    it('responds with 401 unauthorized when no auth header set',
+      () => supertest(app)
+        .get('/api/form')
+        .expect(401, {
+          error: 'Missing bearer token',
+        }));
 
     it('returns all user forms', () => supertest(app)
       .get('/api/form')

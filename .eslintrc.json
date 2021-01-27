@@ -27,7 +27,15 @@
     "func-names": "off",
     "no-process-exit": "off",
     "class-methods-use-this": "off",
-    "consistent-return": "off"
+    "consistent-return": "off",
+    "max-len": [
+      "error",
+      {
+        "code": 80,
+        "ignoreStrings": true,
+        "ignoreRegExpLiterals": true
+      }
+    ]
   },
   "overrides": [
     {

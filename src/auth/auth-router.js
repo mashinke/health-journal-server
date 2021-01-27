@@ -11,7 +11,8 @@ authRouter
     const { email, password } = req.body;
     const loginUser = { email, password };
 
-    const [nullValueKey] = Object.entries(loginUser).find(([, value]) => value == null) || [];
+    const [nullValueKey] = Object.entries(loginUser)
+      .find(([, value]) => value == null) || [];
 
     if (nullValueKey) {
       return res.status(400).json({

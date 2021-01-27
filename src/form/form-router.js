@@ -33,8 +33,9 @@ formRouter
         const { name, description, fields } = req.body;
         const newFormData = { name, description, fields };
 
-        const [nullKey] = Object.entries(newFormData)
-          .find(([key, value]) => (value == null) && key !== 'description') || [];
+        const [nullKey] = Object.entries(newFormData).find(
+          ([key, value]) => (value == null) && key !== 'description',
+        ) || [];
 
         if (nullKey) {
           return res.status(400).json({
@@ -75,7 +76,8 @@ formRouter
             });
         }
 
-        const latestFormVersion = await FormService.getUserFormLatest(db, req.user.id, formId);
+        const latestFormVersion = await FormService
+          .getUserFormLatest(db, req.user.id, formId);
 
         if (!latestFormVersion) {
           return res

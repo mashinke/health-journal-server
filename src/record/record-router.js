@@ -28,7 +28,8 @@ recordRouter
       const db = req.app.get('db');
 
       // validate formId
-      const latestUserForm = await FormService.getUserFormLatest(db, req.user.id, formId);
+      const latestUserForm = await FormService
+        .getUserFormLatest(db, req.user.id, formId);
 
       if (!latestUserForm) {
         return res.status(400).json({

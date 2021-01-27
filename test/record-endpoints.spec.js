@@ -41,11 +41,12 @@ describe('Record Endpoints', function () {
   describe('POST /api/record', () => {
     const requiredFields = ['formId', 'values'];
 
-    it('responds with 401 unauthorized when no auth header set', () => supertest(app)
-      .post('/api/record')
-      .expect(401, {
-        error: 'Missing bearer token',
-      }));
+    it('responds with 401 unauthorized when no auth header set',
+      () => supertest(app)
+        .post('/api/record')
+        .expect(401, {
+          error: 'Missing bearer token',
+        }));
 
     requiredFields.forEach((field) => {
       const postAttemptBody = {
@@ -81,7 +82,8 @@ describe('Record Endpoints', function () {
         .set(auth)
         .send(postAttemptBody)
         .expect(400, {
-          error: `Form ID ${postAttemptBody.formId} not found for user ${testUser.username}`,
+          error: `Form ID ${postAttemptBody.formId
+          } not found for user ${testUser.username}`,
         });
     });
 
