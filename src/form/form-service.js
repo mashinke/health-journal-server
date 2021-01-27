@@ -84,7 +84,7 @@ const FormService = {
     const description = xss(form.description);
     const fields = form.fields.map((field) => {
       const {
-        type, min, max, fieldId,
+        type, min, max, id: fieldId,
       } = field;
       const label = xss(field.label);
       return {
