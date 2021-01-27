@@ -7,6 +7,9 @@
     "airbnb-base",
     "plugin:node/recommended"
   ],
+  "plugins": [
+    "chai-friendly"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -46,7 +49,9 @@
         "func-names": "off",
         "prefer-arrow-callback": "off",
         "node/no-unpublished-require": "off",
-        "camelcase": "warn"
+        "camelcase": "warn",
+        "no-unused-expressions": "off",
+        "chai-friendly/no-unused-expressions": "error"
       },
       "globals": {
         "expect": true,

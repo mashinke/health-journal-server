@@ -21,18 +21,16 @@ describe('Auth Endpoints', function () {
 
   /**
    * @description Get token for login
-   **/
+   * */
   describe('POST /api/auth/token', () => {
-    beforeEach('insert users', () =>
-      helpers.seedUsers(
-        db,
-        testUsers,
-      )
-    );
+    beforeEach('insert users', () => helpers.seedUsers(
+      db,
+      testUsers,
+    ));
 
     const requiredFields = ['email', 'password'];
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       const loginAttemptBody = {
         email: testUser.email,
         password: testUser.password,
@@ -78,7 +76,7 @@ describe('Auth Endpoints', function () {
           subject: testUser.email,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: 'HS256',
-        }
+        },
       );
       return supertest(app)
         .post('/api/auth/token')
@@ -91,14 +89,12 @@ describe('Auth Endpoints', function () {
 
   /**
    * @description Refresh token
-   **/
+   * */
   describe('PATCH /api/auth/token', () => {
-    beforeEach('insert users', () =>
-      helpers.seedUsers(
-        db,
-        testUsers,
-      )
-    );
+    beforeEach('insert users', () => helpers.seedUsers(
+      db,
+      testUsers,
+    ));
 
     it('responds 200 and JWT auth token using secret', () => {
       const expectedToken = jwt.sign(
@@ -108,7 +104,7 @@ describe('Auth Endpoints', function () {
           subject: testUser.email,
           expiresIn: process.env.JWT_EXPIRY,
           algorithm: 'HS256',
-        }
+        },
       );
       return supertest(app)
         .put('/api/auth/token')

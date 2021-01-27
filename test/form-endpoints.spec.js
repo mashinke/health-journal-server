@@ -1,6 +1,5 @@
 const { expect } = require('chai');
 const supertest = require('supertest');
-const { set, post } = require('../src/app');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
@@ -12,7 +11,6 @@ describe('Form Endpoints', function () {
   const testForms = helpers.makeFormsArray();
   const testRecords = helpers.makeRecordsArray();
 
-  const testForm = testForms[0];
   const testUser = testUsers[0];
   const auth = { Authorization: helpers.makeAuthHeader(testUser) };
 
@@ -25,73 +23,62 @@ describe('Form Endpoints', function () {
 
   before('cleanup', () => helpers.cleanTables(db));
 
-  beforeEach('seed fixtures', () =>
-    helpers.seedUsersFormsRecords(
-      db,
-      testUsers,
-      testForms,
-      testFormVersions,
-      testRecords
-    )
-  );
+  beforeEach('seed fixtures', () => helpers.seedUsersFormsRecords(
+    db,
+    testUsers,
+    testForms,
+    testFormVersions,
+    testRecords,
+  ));
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   /**
    * @description Get an array of a user's Forms
-   **/
+   * */
   describe('GET /api/form', () => {
-    it('responds with 401 unauthorized when no auth header set', () => {
-      return supertest(app)
-        .get('/api/form')
-        .expect(401, {
-          error: 'Missing bearer token'
-        })
-    });
+    it('responds with 401 unauthorized when no auth header set', () => supertest(app)
+      .get('/api/form')
+      .expect(401, {
+        error: 'Missing bearer token',
+      }));
 
-    it('returns all user forms', () => {
-      return supertest(app)
-        .get('/api/form')
-        .set(auth)
-        .expect(200)
-        .expect(res => {
-          expect(res.body).to.be.an('array');
-          res.body.forEach(form =>
-            expect(form).to.include.all.keys(
-              'id',
-              'name',
-              'fields'
-            )
-          );
-        });
-    });
+    it('returns all user forms', () => supertest(app)
+      .get('/api/form')
+      .set(auth)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body).to.be.an('array');
+        res.body.forEach((form) => expect(form).to.include.all.keys(
+          'id',
+          'name',
+          'fields',
+        ));
+      }));
   });
-
 
   /**
    * @description Post a new Form
-   **/
+   * */
   describe('POST /api/form', () => {
     const requiredFields = ['name', 'fields'];
 
-    it('responds with 401 unauthorized when no auth header set', () => {
-      return supertest(app)
-        .post('/api/form')
-        .expect(401, {
-          error: 'Missing bearer token'
-        })
-    });
+    it('responds with 401 unauthorized when no auth header set', () => supertest(app)
+      .post('/api/form')
+      .expect(401, {
+        error: 'Missing bearer token',
+      }));
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       const postAttemptBody = {
         name: 'test form',
         fields: [
           {
             id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
-            type: 'string'
-          }
-        ]
+            type: 'string',
+          },
+        ],
       };
 
       it(`responds with 400 required error when '${field}' is missing`, () => {
@@ -102,7 +89,7 @@ describe('Form Endpoints', function () {
           .set(auth)
           .send(postAttemptBody)
           .expect(400, {
-            error: `Missing '${field}' in request body`
+            error: `Missing '${field}' in request body`,
           });
       });
     });
@@ -113,18 +100,18 @@ describe('Form Endpoints', function () {
           {
             foo: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
-            type: 'string'
-          }
+            type: 'string',
+          },
         ],
         name: 'new-test-form',
-        description: 'another form to test'
+        description: 'another form to test',
       };
       return supertest(app)
         .post('/api/form')
         .set(auth)
         .send(postAttemptBody)
         .expect(400, {
-          error: `'foo' is not a valid field key`
+          error: '\'foo\' is not a valid field key',
         });
     });
 
@@ -133,18 +120,18 @@ describe('Form Endpoints', function () {
         fields: [
           {
             label: 'labelOne',
-            type: 'string'
-          }
+            type: 'string',
+          },
         ],
         name: 'new-test-form',
-        description: 'another form to test'
+        description: 'another form to test',
       };
       return supertest(app)
         .post('/api/form')
         .set(auth)
         .send(postAttemptBody)
         .expect(400, {
-          error: `'id' is missing from field`
+          error: '\'id\' is missing from field',
         });
     });
 
@@ -154,18 +141,18 @@ describe('Form Endpoints', function () {
           {
             id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
-            type: 'invalid'
-          }
+            type: 'invalid',
+          },
         ],
         name: 'new-test-form',
-        description: 'another form to test'
+        description: 'another form to test',
       };
       return supertest(app)
         .post('/api/form')
         .set(auth)
         .send(postAttemptBody)
         .expect(400, {
-          error: `'invalid' is not a valid field type`
+          error: '\'invalid\' is not a valid field type',
         });
     });
 
@@ -175,52 +162,44 @@ describe('Form Endpoints', function () {
           {
             id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
-            type: 'string'
+            type: 'string',
           },
           {
             id: '2888aa74-4eef-11eb-b544-9ff93ffc6d13',
             label: 'labelTwo',
-            type: 'number'
-          }
+            type: 'number',
+          },
         ],
         name: 'new-test-form',
-        description: 'another form to test'
-      }
-      it('returns 201, valid form', () => {
-        return supertest(app)
-          .post('/api/form')
-          .set(auth)
-          .send(postAttemptBody)
-          .expect(201)
-          .expect(res => {
-            expect(res.body).to.have.property('id');
-            expect(res.body).to.have.property('name');
-            expect(res.body).to.have.property('description');
-            expect(res.body).to.have.property('fields');
-          })
-      });
-      it('stores the new form in db', () => {
-        return supertest(app)
-          .post('/api/form')
-          .set(auth)
-          .send(postAttemptBody)
-          .then(res => {
-            return db
-              .from('form_version')
-              .select('fields')
-              .where({ id_form: res.body.id, latest: true })
-              .first()
-              .then(row =>
-                expect(row.fields).to.eql(postAttemptBody.fields)
-              );
-          });
-      });
+        description: 'another form to test',
+      };
+      it('returns 201, valid form', () => supertest(app)
+        .post('/api/form')
+        .set(auth)
+        .send(postAttemptBody)
+        .expect(201)
+        .expect((res) => {
+          expect(res.body).to.have.property('id');
+          expect(res.body).to.have.property('name');
+          expect(res.body).to.have.property('description');
+          expect(res.body).to.have.property('fields');
+        }));
+      it('stores the new form in db', () => supertest(app)
+        .post('/api/form')
+        .set(auth)
+        .send(postAttemptBody)
+        .then((res) => db
+          .from('form_version')
+          .select('fields')
+          .where({ id_form: res.body.id, latest: true })
+          .first()
+          .then((row) => expect(row.fields).to.eql(postAttemptBody.fields))));
     });
   });
 
   /**
   * @description Update a Form
-  **/
+  * */
   describe('PATCH /api/form', () => {
     describe('given a valid requrest', () => {
       const patchAttemptBody = {
@@ -228,35 +207,31 @@ describe('Form Endpoints', function () {
           {
             id: '2888e8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'ChangedLabel',
-            type: 'string'
+            type: 'string',
           },
           {
             id: '2888aa74-4eef-11eb-b544-9ff93ffc6d13',
             label: 'labelTwo',
-            type: 'number'
-          }
+            type: 'number',
+          },
         ],
-        description: 'this form was updated'
-      }
+        description: 'this form was updated',
+      };
       const formId = 1;
-      it('returns 200 and inserts the updated version in db', () =>
-        supertest(app)
-          .patch(`/api/form/${formId}`)
-          .set(auth)
-          .send(patchAttemptBody)
-          .expect(200)
-          .then(res =>
-            db
-              .from('form_version')
-              .select('*')
-              .where({ id_form: res.body.id, latest: true })
-              .first()
-              .then(row => {
-                expect(row.description).to.eql(patchAttemptBody.description);
-                expect(row.fields).to.eql(patchAttemptBody.fields);
-              })
-          )
-      );
+      it('returns 200 and inserts the updated version in db', () => supertest(app)
+        .patch(`/api/form/${formId}`)
+        .set(auth)
+        .send(patchAttemptBody)
+        .expect(200)
+        .then((res) => db
+          .from('form_version')
+          .select('*')
+          .where({ id_form: res.body.id, latest: true })
+          .first()
+          .then((row) => {
+            expect(row.description).to.eql(patchAttemptBody.description);
+            expect(row.fields).to.eql(patchAttemptBody.fields);
+          })));
     });
   });
 });

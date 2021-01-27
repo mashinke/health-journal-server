@@ -38,9 +38,9 @@ function makeFormsArray() {
   return [
     {
       id: 1,
-      id_user: 1
-    }
-  ]
+      id_user: 1,
+    },
+  ];
 }
 
 function makeFormVersionsArray() {
@@ -53,31 +53,31 @@ function makeFormVersionsArray() {
           {
             id: '2888a8b2-4ec2-11eb-b543-bfee7e1d4520',
             label: 'labelOne',
-            type: 'string'
+            type: 'string',
           },
           {
             id: '2888aa74-4ec2-11eb-b544-9ff93ffc6d13',
             label: 'labelTwo',
-            type: 'number'
+            type: 'number',
           },
           {
             id: '2888aad8-4ec2-11eb-b546-9f3c6f78d71a',
             label: 'labelFour',
             type: 'range',
             min: 0,
-            max: 5
+            max: 5,
           },
           {
             id: '2888aab0-4ec2-11eb-b545-8f760ba05e58',
             label: 'labelThree',
-            type: 'boolean'
+            type: 'boolean',
           },
-        ]
+        ],
       ),
       description: 'test description',
-      id_form: 1
+      id_form: 1,
     },
-  ]
+  ];
 }
 
 function makeRecordsArray() {
@@ -88,7 +88,7 @@ function makeRecordsArray() {
         '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': '<SCRIPT>evil</SCRIPT>',
         '2888aa74-4ec2-11eb-b544-9ff93ffc6d13': 5,
         '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
-        '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 3
+        '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 3,
       }),
       id_form_version: 1,
     },
@@ -98,11 +98,11 @@ function makeRecordsArray() {
         '2888a8b2-4ec2-11eb-b543-bfee7e1d4520': 'valueOne',
         '2888aa74-4ec2-11eb-b544-9ff93ffc6d13': 5,
         '2888aab0-4ec2-11eb-b545-8f760ba05e58': true,
-        '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 5
+        '2888aad8-4ec2-11eb-b546-9f3c6f78d71a': 5,
       }),
-      id_form_version: 1
+      id_form_version: 1,
     },
-  ]
+  ];
 }
 
 /**
@@ -125,33 +125,29 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
  * @returns {Promise} - when tables are cleared
  */
 function cleanTables(db) {
-  return db.transaction(trx =>
-    trx.raw(
-      `TRUNCATE
+  return db.transaction((trx) => trx.raw(
+    `TRUNCATE
         "record_tag",
         "tag",
         "record",
         "form_version",
         "form",
-        "user"`
-    )
-      .then(() =>
-        Promise.all([
-          trx.raw('ALTER SEQUENCE user_id_seq minvalue 0 START WITH 1'),
-          trx.raw('ALTER SEQUENCE form_id_seq minvalue 0 START WITH 1'),
-          trx.raw('ALTER SEQUENCE form_version_id_seq minvalue 0 START WITH 1'),
-          trx.raw('ALTER SEQUENCE record_id_seq minvalue 0 START WITH 1'),
-          trx.raw('ALTER SEQUENCE tag_id_seq minvalue 0 START WITH 1'),
-          trx.raw('ALTER SEQUENCE record_tag_id_seq minvalue 0 START WITH 1'),
-          trx.raw('SELECT setval(\'user_id_seq\', 0)'),
-          trx.raw('SELECT setval(\'form_id_seq\', 0)'),
-          trx.raw('SELECT setval(\'form_version_id_seq\', 0)'),
-          trx.raw('SELECT setval(\'record_id_seq\', 0)'),
-          trx.raw('SELECT setval(\'tag_id_seq\', 0)'),
-          trx.raw('SELECT setval(\'record_tag_id_seq\', 0)'),
-        ])
-      )
-  );
+        "user"`,
+  )
+    .then(() => Promise.all([
+      trx.raw('ALTER SEQUENCE user_id_seq minvalue 0 START WITH 1'),
+      trx.raw('ALTER SEQUENCE form_id_seq minvalue 0 START WITH 1'),
+      trx.raw('ALTER SEQUENCE form_version_id_seq minvalue 0 START WITH 1'),
+      trx.raw('ALTER SEQUENCE record_id_seq minvalue 0 START WITH 1'),
+      trx.raw('ALTER SEQUENCE tag_id_seq minvalue 0 START WITH 1'),
+      trx.raw('ALTER SEQUENCE record_tag_id_seq minvalue 0 START WITH 1'),
+      trx.raw('SELECT setval(\'user_id_seq\', 0)'),
+      trx.raw('SELECT setval(\'form_id_seq\', 0)'),
+      trx.raw('SELECT setval(\'form_version_id_seq\', 0)'),
+      trx.raw('SELECT setval(\'record_id_seq\', 0)'),
+      trx.raw('SELECT setval(\'tag_id_seq\', 0)'),
+      trx.raw('SELECT setval(\'record_tag_id_seq\', 0)'),
+    ])));
 }
 
 /**
@@ -161,11 +157,11 @@ function cleanTables(db) {
  * @returns {Promise} - when users table seeded
  */
 function seedUsers(db, users) {
-  const preppedUsers = users.map(user => ({
+  const preppedUsers = users.map((user) => ({
     ...user,
-    password: bcrypt.hashSync(user.password, 1)
+    password: bcrypt.hashSync(user.password, 1),
   }));
-  return db.transaction(async trx => {
+  return db.transaction(async (trx) => {
     await trx.into('user').insert(preppedUsers);
 
     await trx.raw(
@@ -175,11 +171,11 @@ function seedUsers(db, users) {
   });
 }
 
-async function seedUsersFormsRecords(db, users, forms, form_versions, records) {
+async function seedUsersFormsRecords(db, users, forms, formVersions, records) {
   await seedUsers(db, users);
-  await db.transaction(async trx => {
+  await db.transaction(async (trx) => {
     await trx.into('form').insert(forms);
-    await trx.into('form_version').insert(form_versions);
+    await trx.into('form_version').insert(formVersions);
     await trx.into('record').insert(records);
 
     await Promise.all([
@@ -189,12 +185,12 @@ async function seedUsersFormsRecords(db, users, forms, form_versions, records) {
       ),
       trx.raw(
         'SELECT setval(\'form_version_id_seq\', ?)',
-        [form_versions[form_versions.length - 1].id],
+        [formVersions[formVersions.length - 1].id],
       ),
       trx.raw(
         'SELECT setval(\'record_id_seq\', ?)',
         [records[records.length - 1].id],
-      )
+      ),
     ]);
   });
 }
@@ -208,5 +204,5 @@ module.exports = {
   makeAuthHeader,
   cleanTables,
   seedUsers,
-  seedUsersFormsRecords
+  seedUsersFormsRecords,
 };
